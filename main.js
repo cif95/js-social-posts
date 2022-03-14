@@ -148,7 +148,7 @@ const posts = [
 		"media": "https://unsplash.it/600/400?image=634",
 		"author": {
 			"name": "Alberto Lorusso",
-			"image": "https://unsplash.it/300/300?image=23"
+			"image": ""
 		},
 		"likes": 415,
 		"created": "2021-09-05"
@@ -170,12 +170,16 @@ const posts = [
 
 posts.forEach((element)=> {
 let date = formatDateFromYyMmDdToDdMmYy(element['created']);
+// if ( element['author']['image'] == "" ){
+// 	console.log(element['author']['name'].charAt(0));
+// 	element['author']['image'] == ""
+// }
 document.getElementById('container').innerHTML += `
 	<div class="post">
 		<div class="post__header">
 				<div class="post-meta">                    
 					<div class="post-meta__icon">
-						<img class="profile-pic" src=${element['author']['image']} alt=${element['author']['name']}>                    
+						<img class="profile-pic" src=${element['author']['image']} alt=${element['author']['name']}>
 					</div>
 					<div class="post-meta__data">
 						<div class="post-meta__author">${element['author']['name']}</div>
@@ -210,21 +214,27 @@ document.getElementById('container').innerHTML += `
 const IdPostsLiked = [];
 
 document.querySelectorAll('a.js-like-button').forEach((element)=> {
+	let isClicked = false;
 	element.addEventListener('click', function() {
 		this.classList.toggle('like-button--liked');
 		IdPostsLiked.push(parseInt(this.dataset.postid));
-		console.log(IdPostsLiked);
-		let likes = parseInt(this.parentNode.parentNode.children[1].children[0].innerHTML);
-		likes++;
-		this.parentNode.parentNode.children[1].children[0].innerHTML = likes;
-	});
+		let likesCounterElement = this.parentNode.parentNode.children[1].children[0];
+		
+		if (!isClicked){
+			likesCounterElement = likesCounterElement.innerHTML++;
+			isClicked = true;
+		} else {
+			likesCounterElement = likesCounterElement.innerHTML--;
+			isClicked = false;
+		}
+		});
 });
 
 
 
 
 /**
- * Function that format a string date from format YY MM DD to format DD MM YY
+ * Function that format a string date from format YY-MM-DD to format DD-MM-YY
  * @param {*} string string to be formatted
  * @returns a date in format DD MM YY
  */
