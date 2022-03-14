@@ -221,15 +221,22 @@ document.querySelectorAll('a.js-like-button').forEach((element)=> {
 });
 
 
+
+
+/**
+ * Function that format a string date from format YY MM DD to format DD MM YY
+ * @param {*} string string to be formatted
+ * @returns a date in format DD MM YY
+ */
 function formatDateFromYyMmDdToDdMmYy(string){
 	let italianDate;
 	let year = 		string.charAt(0) 
 					+ string.charAt(1)
 					+ string.charAt(2)
 					+ string.charAt(3);
-	let day = 		string.charAt(5)
+	let month = 		string.charAt(5)
 					+ string.charAt(6);
-	let month = 	string.charAt(8)
+	let day = 	string.charAt(8)
 					+ string.charAt(9);
 	return italianDate = `${day}-${month}-${year}`;
 }
