@@ -169,7 +169,8 @@ const posts = [
 // 3 - Al click su un pulsante "Mi Piace" di un post, se abbiamo già cliccato dobbiamo decrementare il contatore e cambiare il colore del bottone.
 
 posts.forEach((element)=> {
-	document.getElementById('container').innerHTML += `
+let date = formatDateFromYyMmDdToDdMmYy(element['created']);
+document.getElementById('container').innerHTML += `
 	<div class="post">
 		<div class="post__header">
 				<div class="post-meta">                    
@@ -178,7 +179,7 @@ posts.forEach((element)=> {
 					</div>
 					<div class="post-meta__data">
 						<div class="post-meta__author">${element['author']['name']}</div>
-						<div class="post-meta__time">${element['created']}</div>
+						<div class="post-meta__time">${date}</div>
 					</div>                    
 				</div>
 		</div>
@@ -218,3 +219,17 @@ document.querySelectorAll('a.js-like-button').forEach((element)=> {
 		this.parentNode.parentNode.children[1].children[0].innerHTML = likes;
 	});
 });
+
+
+function formatDateFromYyMmDdToDdMmYy(string){
+	let italianDate;
+	let year = 		string.charAt(0) 
+					+ string.charAt(1)
+					+ string.charAt(2)
+					+ string.charAt(3);
+	let day = 		string.charAt(5)
+					+ string.charAt(6);
+	let month = 	string.charAt(8)
+					+ string.charAt(9);
+	return italianDate = `${day}-${month}-${year}`;
+}
