@@ -1,3 +1,14 @@
+// Descrizione
+// Ricreiamo un feed social aggiungendo al layout di base fornito, il nostro script JS in cui:
+// Milestone 1 - Creiamo il nostro array di oggetti che rappresentano ciascun post. Ogni post dovrà avere le informazioni necessarie per stampare la relativa card: id del post, numero progressivo da 1 a n nome autore, foto autore, data in formato americano (mm-gg-yyyy), testo del post, immagine (non tutti i post devono avere una immagine), numero di likes.
+// Non è necessario creare date casuali, per le immagini va bene utilizzare qualsiasi servizio di placeholder ad es. Unsplash (https://unsplash.it/300/300?image=<id>)
+// Milestone 2 - Prendendo come riferimento il layout di esempio presente nell'html, stampiamo i post del nostro feed.
+// Milestone 3 - Se clicchiamo sul tasto "Mi Piace" cambiamo il colore al testo del bottone e incrementiamo il counter dei likes relativo. Salviamo in un secondo array gli id dei post ai quali abbiamo messo il like.
+// ** BONUS
+// 1 - Formattare le date in formato italiano (gg/mm/aaaa)
+// 2 - Gestire l'assenza dell'immagine profilo con un elemento di fallback che contiene le iniziali dell'utente (es. Luca Formicola > LF).
+// 3 - Al click su un pulsante "Mi Piace" di un post, se abbiamo già cliccato dobbiamo decrementare il contatore e cambiare il colore del bottone.
+
 const posts = [
 	{
 		"id": 1,
@@ -148,7 +159,7 @@ const posts = [
 		"media": "https://unsplash.it/600/400?image=634",
 		"author": {
 			"name": "Alberto Lorusso",
-			"image": ""
+			"image": null
 		},
 		"likes": 415,
 		"created": "2021-09-05"
@@ -156,89 +167,58 @@ const posts = [
 ];
 
 
-
-// Descrizione
-// Ricreiamo un feed social aggiungendo al layout di base fornito, il nostro script JS in cui:
-// Milestone 1 - Creiamo il nostro array di oggetti che rappresentano ciascun post. Ogni post dovrà avere le informazioni necessarie per stampare la relativa card: id del post, numero progressivo da 1 a n nome autore, foto autore, data in formato americano (mm-gg-yyyy), testo del post, immagine (non tutti i post devono avere una immagine), numero di likes.
-// Non è necessario creare date casuali, per le immagini va bene utilizzare qualsiasi servizio di placeholder ad es. Unsplash (https://unsplash.it/300/300?image=<id>)
-// Milestone 2 - Prendendo come riferimento il layout di esempio presente nell'html, stampiamo i post del nostro feed.
-// Milestone 3 - Se clicchiamo sul tasto "Mi Piace" cambiamo il colore al testo del bottone e incrementiamo il counter dei likes relativo. Salviamo in un secondo array gli id dei post ai quali abbiamo messo il like.
-// ** BONUS
-// 1 - Formattare le date in formato italiano (gg/mm/aaaa)
-// 2 - Gestire l'assenza dell'immagine profilo con un elemento di fallback che contiene le iniziali dell'utente (es. Luca Formicola > LF).
-// 3 - Al click su un pulsante "Mi Piace" di un post, se abbiamo già cliccato dobbiamo decrementare il contatore e cambiare il colore del bottone.
-
-posts.forEach((element)=> {
-let date = formatDateFromYyMmDdToDdMmYy(element['created']);
-// if ( element['author']['image'] == "" ){
-// 	console.log(element['author']['name'].charAt(0));
-// 	element['author']['image'] == ""
-// }
-document.getElementById('container').innerHTML += `
-	<div class="post">
-		<div class="post__header">
-				<div class="post-meta">                    
-					<div class="post-meta__icon">
-						<img class="profile-pic" src=${element['author']['image']} alt=${element['author']['name']}>
-					</div>
-					<div class="post-meta__data">
-						<div class="post-meta__author">${element['author']['name']}</div>
-						<div class="post-meta__time">${date}</div>
-					</div>                    
-				</div>
-		</div>
-		<div class="post__text">${element['content']}</div>
-		<div class="post__image">
-				<img src=${element['media']} alt="image post">
-		</div>
-		<div class="post__footer">
-				<div class="likes js-likes">
-					<div class="likes__cta">
-						<a class="like-button  js-like-button" href="#" data-postid="${element['id']}">
-								<i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
-								<span class="like-button__label">Mi Piace</span>
-						</a>
-					</div>
-					<div class="likes__counter">
-						Piace a <b id="like-counter-${element['id']}" class="js-likes-counter">${element['likes']}</b> persone
-					</div>
-				</div> 
-		</div>            
-	</div>`;
-});
+posts.forEach((element) => generatePost('container', element));
 
 
-
-// Milestone 3 - Se clicchiamo sul tasto "Mi Piace" cambiamo il colore al testo del bottone e incrementiamo il counter dei likes relativo.
-// Salviamo in un secondo array gli id dei post ai quali abbiamo messo il like.
-const IdPostsLiked = [];
+const likedPosts = [];
 
 document.querySelectorAll('a.js-like-button').forEach((element)=> {
-	let isClicked = false;
-	element.addEventListener('click', function() {
+	let isLiked = false;
+	element.addEventListener('click', function(event) {
+		event.preventDefault();
 		this.classList.toggle('like-button--liked');
-		IdPostsLiked.push(parseInt(this.dataset.postid));
 		let likesCounterElement = this.parentNode.parentNode.children[1].children[0];
+		const postId = parseInt(this.dataset.postid);
 		
-		if (!isClicked){
+		if (!isLiked){
 			likesCounterElement = likesCounterElement.innerHTML++;
-			isClicked = true;
+			isLiked = true;
+			likedPosts.push(postId);
 		} else {
 			likesCounterElement = likesCounterElement.innerHTML--;
-			isClicked = false;
+			likedPosts.splice(likedPosts.indexOf(postId),1);
+			isLiked = false;
 		}
+
+		console.log(likedPosts);
 		});
 });
 
 
 
+// ! functions below ! //
 
 /**
- * Function that format a string date from format YY-MM-DD to format DD-MM-YY
- * @param {*} string string to be formatted
- * @returns a date in format DD MM YY
+ * function that returns the initials of a given full name
+ * @param {*} fullNameString full name string from which getting initials
+ * @returns the initials of the given full name
  */
-function formatDateFromYyMmDdToDdMmYy(string){
+function getInitials (fullNameString) {
+	let fullName = fullNameString.split(' '),
+		initials = fullName[0].substring(0, 1);
+	
+	if (fullName.length > 1) {
+		initials += fullName[fullName.length - 1].substring(0, 1);
+	}
+	return initials.toUpperCase();
+};
+
+/**
+ * Function that changes a string date format from YY-MM-DD to DD-MM-YY
+ * @param {*} string string containing a date with format YY-MM-DD ( must be ex. 2012-12-31  --> required dashes or slashes)
+ * @returns a date in format DD-MM-YY
+ */
+function getItalianDate(string){
 	let italianDate;
 	let year = 		string.charAt(0) 
 					+ string.charAt(1)
@@ -250,3 +230,52 @@ function formatDateFromYyMmDdToDdMmYy(string){
 					+ string.charAt(9);
 	return italianDate = `${day}-${month}-${year}`;
 }
+
+
+/**function that generates a new post
+ * 
+ * @param {*} parentId id of the dom wrapper element in which post will be added
+ * @param {*} postObj post object containing id, content, media, author, likes and created properties
+ */
+function generatePost(parentId, postObj) {
+	// deconstructing object
+	const {id, content, media, author, likes, created} = postObj;
+	// gettin date in format dd/mm/yy
+	let date = getItalianDate(created);
+
+	document.getElementById(parentId).innerHTML += `
+	<div class="post">
+		<div class="post__header">
+				<div class="post-meta">                    
+					<div class="post-meta__icon">
+						<img class="profile-pic" src=${author.image} alt=${getInitials(author.name)}>
+					</div>
+					<div class="post-meta__data">
+						<div class="post-meta__author">${author.name}</div>
+						<div class="post-meta__time">${date}</div>
+					</div>                    
+				</div>
+		</div>
+		<div class="post__text">${content}</div>
+		<div class="post__image">
+				<img src=${media} alt="image post ${id}">
+		</div>
+		<div class="post__footer">
+				<div class="likes js-likes">
+					<div class="likes__cta">
+						<a class="like-button  js-like-button" href="#" data-postid="${id}">
+								<i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
+								<span class="like-button__label">Mi Piace</span>
+						</a>
+					</div>
+					<div class="likes__counter">
+						Piace a <b id="like-counter-${id}" class="js-likes-counter">${likes}</b> persone
+					</div>
+				</div> 
+		</div>            
+	</div>`;
+
+};
+
+
+
